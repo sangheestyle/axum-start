@@ -28,6 +28,17 @@ psql -h localhost -U sanghee -d axum
 CREATE TABLE IF NOT EXISTS todo (id TEXT PRIMARY KEY NOT NULL, body TEXT NOT NULL, complete BOOLEAN NOT NULL);
 ```
 
+### Offline Mode
+
+```
+cargo sqlx prepare
+```
+
+* DB 접속된 상태에서(.env 등) 위 명령어 실행하면 .sqlx 폴더 아래 코드상의 모든 쿼리를 validate 하고 그 결과를 남겨둠
+* DATABASE_URL 가 없어도 문제 없이 빌드됨 - offline
+* 쿼리 추가되면 다시 위 명령어를 DATABASE_URL 에 있는 디비 연결해서 업데이트하고 commit push 하고 진행하면 됨
+* 참고: https://docs.rs/sqlx/latest/sqlx/macro.query.html#offline-mode-requires-the-offline-feature
+
 ## TODO
 
 - .env 되도록 고치고

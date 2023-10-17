@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE todo SET complete=NOT complete WHERE id=$1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "383debf072f1a0591534efaa040365f000ac97a5599613b8b64d9aa0b1f4093a"
+}
