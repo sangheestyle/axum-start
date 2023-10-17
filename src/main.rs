@@ -23,7 +23,6 @@ async fn graphiql() -> impl IntoResponse {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    // create the schema
     let schema = Schema::build(Query, EmptyMutation, EmptySubscription).finish();
     let app = Router::new()
         .route("/graphql", post_service(GraphQL::new(schema)))
