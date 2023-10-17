@@ -4,7 +4,7 @@ use async_graphql::{http::GraphiQLSource, EmptyMutation, EmptySubscription, Obje
 use async_graphql_axum::*;
 use axum::{
     response::{self, IntoResponse},
-    routing::get,
+    routing::{get, post_service},
     Router, Server,
 };
 
@@ -18,14 +18,16 @@ impl Query {
 }
 
 async fn graphiql() -> impl IntoResponse {
-    response::Html(GraphiQLSource::build().endpoint("/").finish())
+    response::Html(GraphiQLSource::build().endpoint("/graphql").finish())
 }
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     // create the schema
     let schema = Schema::build(Query, EmptyMutation, EmptySubscription).finish();
-    let app = Router::new().route("/", get(graphiql).post_service(GraphQL::new(schema)));
+    let app = Router::new()
+        .route("/graphql", post_service(GraphQL::new(schema)))
+        .route("/graphiql", get(graphiql));
 
     println!("GraphiQL: http://localhost:8000");
 
