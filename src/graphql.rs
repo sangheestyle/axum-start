@@ -1,7 +1,10 @@
 use crate::todo::*;
 use async_graphql::{Context, Enum, FieldResult, Object, SimpleObject, Subscription, ID};
 use futures::Stream;
+use futures_util::StreamExt;
 use sqlx::postgres::PgPool;
+use tokio::time::{interval, Duration};
+use tokio_stream::wrappers::IntervalStream;
 
 #[Object]
 impl Todo {
@@ -117,8 +120,12 @@ pub struct SubscriptionRoot;
 
 #[Subscription]
 impl SubscriptionRoot {
-    async fn events1(&self) -> impl Stream<Item = i32> {
-        futures_util::stream::iter(0..10)
+    async fn every_one_sec(&self) -> impl Stream<Item = i32> {
+        let mut counter = 0;
+        IntervalStream::new(interval(Duration::from_secs(1))).map(move |_| {
+            counter += 1;
+            counter
+        })
     }
     // async fn todos(&self, mutation_type: Option<MutationType>) -> impl Stream<Item = TodoChanged> {
     //     SimpleBroker::<TodoChanged>::subscribe().filter(move |event| {
