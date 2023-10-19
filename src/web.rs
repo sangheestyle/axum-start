@@ -13,7 +13,7 @@ use std::error::Error;
 async fn graphiql() -> impl IntoResponse {
     response::Html(
         GraphiQLSource::build()
-            .endpoint("/graphql")
+            .endpoint("/")
             .subscription_endpoint("/ws")
             .finish(),
     )
@@ -26,12 +26,12 @@ pub async fn start(pool: PgPool) -> Result<(), Box<dyn Error>> {
 
     let app = Router::new()
         .route(
-            "/graphiql",
+            "/",
             get(graphiql).post_service(GraphQL::new(schema.clone())),
         )
         .route_service("/ws", GraphQLSubscription::new(schema));
 
-    println!("GraphiQL: http://localhost:8000/graphiql");
+    println!("GraphiQL: http://localhost:8000");
 
     Server::bind(&"127.0.0.1:8000".parse().unwrap())
         .serve(app.into_make_service())
