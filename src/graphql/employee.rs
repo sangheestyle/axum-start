@@ -1,22 +1,34 @@
-use async_graphql::{Context, Object, Result, ID};
+use crate::models::employee::Employee;
+use crate::models::role::Role;
+
+use async_graphql::*;
 use sqlx::PgPool;
 
-use crate::models::employee::Employee as EmployeeModel;
+#[ComplexObject]
+impl Employee {
+    async fn role(&self, ctx: &Context<'_>) -> Result<Option<Role>> {
+        if let Some(role_id) = self.role_id {
+            let pool = ctx.data::<PgPool>()?;
+            Ok(Role::find_by_id(&pool, role_id).await?)
+        } else {
+            Ok(None)
+        }
+    }
+}
 
 #[derive(Default)]
 pub struct EmployeeQuery;
 
 #[Object]
 impl EmployeeQuery {
-    async fn employee_by_id(&self, ctx: &Context<'_>, id: ID) -> Result<Option<EmployeeModel>> {
+    async fn employees(&self, ctx: &Context<'_>) -> Result<Vec<Employee>> {
         let pool = ctx.data::<PgPool>()?;
-        let id: i32 = id.parse()?;
-        Ok(EmployeeModel::find_by_id(&pool, id).await?)
+        Ok(Employee::find_all(&pool).await?)
     }
 
-    async fn all_employees(&self, ctx: &Context<'_>) -> Result<Vec<EmployeeModel>> {
+    async fn employee_by_id(&self, ctx: &Context<'_>, id: i32) -> Result<Option<Employee>> {
         let pool = ctx.data::<PgPool>()?;
-        Ok(EmployeeModel::find_all(&pool).await?)
+        Ok(Employee::find_by_id(&pool, id).await?)
     }
 }
 
@@ -31,28 +43,25 @@ impl EmployeeMutation {
         name: String,
         role_id: Option<i32>,
         team_id: Option<i32>,
-    ) -> Result<EmployeeModel> {
+    ) -> Result<Employee> {
         let pool = ctx.data::<PgPool>()?;
-        Ok(EmployeeModel::create(&pool, &name, role_id, team_id).await?)
+        Ok(Employee::create(&pool, &name, role_id, team_id).await?)
     }
 
     async fn update_employee(
         &self,
         ctx: &Context<'_>,
-        id: ID,
+        id: i32,
         name: String,
         role_id: Option<i32>,
         team_id: Option<i32>,
-    ) -> Result<EmployeeModel> {
+    ) -> Result<Employee> {
         let pool = ctx.data::<PgPool>()?;
-        let id: i32 = id.parse()?;
-        Ok(EmployeeModel::update(&pool, id, &name, role_id, team_id).await?)
+        Ok(Employee::update(&pool, id, &name, role_id, team_id).await?)
     }
 
-    async fn delete_employee(&self, ctx: &Context<'_>, id: ID) -> Result<i32> {
+    async fn delete_employee(&self, ctx: &Context<'_>, id: i32) -> Result<u64> {
         let pool = ctx.data::<PgPool>()?;
-        let id: i32 = id.parse()?;
-        EmployeeModel::delete(&pool, id).await?;
-        Ok(id)
+        Ok(Employee::delete(&pool, id).await?)
     }
 }

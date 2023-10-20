@@ -1,6 +1,6 @@
 use async_graphql::SimpleObject;
 use chrono::NaiveDateTime;
-use sqlx::FromRow;
+use sqlx::{FromRow, PgPool};
 
 #[derive(FromRow, SimpleObject, Debug)]
 pub struct Role {
@@ -13,10 +13,7 @@ pub struct Role {
 
 impl Role {
     // Fetch a role by ID
-    pub async fn find_by_id(
-        pool: &sqlx::PgPool,
-        role_id: i32,
-    ) -> Result<Option<Self>, sqlx::Error> {
+    pub async fn find_by_id(pool: &PgPool, role_id: i32) -> Result<Option<Self>, sqlx::Error> {
         sqlx::query_as!(
             Role,
             r#"
@@ -29,7 +26,7 @@ impl Role {
     }
 
     // Fetch all roles
-    pub async fn find_all(pool: &sqlx::PgPool) -> Result<Vec<Self>, sqlx::Error> {
+    pub async fn find_all(pool: &PgPool) -> Result<Vec<Self>, sqlx::Error> {
         sqlx::query_as!(
             Role,
             r#"
@@ -42,7 +39,7 @@ impl Role {
 
     // Insert a new Role
     pub async fn create(
-        pool: &sqlx::PgPool,
+        pool: &PgPool,
         name: &str,
         description: Option<&str>,
     ) -> Result<Self, sqlx::Error> {
@@ -62,7 +59,7 @@ impl Role {
 
     // Update an existing Role by ID
     pub async fn update(
-        pool: &sqlx::PgPool,
+        pool: &PgPool,
         id: i32,
         name: &str,
         description: Option<&str>,
@@ -84,7 +81,7 @@ impl Role {
     }
 
     // Delete a Role by ID
-    pub async fn delete(pool: &sqlx::PgPool, id: i32) -> Result<u64, sqlx::Error> {
+    pub async fn delete(pool: &PgPool, id: i32) -> Result<u64, sqlx::Error> {
         sqlx::query!(
             r#"
             DELETE FROM roles WHERE id = $1

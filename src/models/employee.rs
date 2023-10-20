@@ -1,8 +1,9 @@
 use async_graphql::SimpleObject;
 use chrono::NaiveDateTime;
-use sqlx::FromRow;
+use sqlx::{FromRow, PgPool};
 
 #[derive(FromRow, SimpleObject, Debug)]
+#[graphql(complex)]
 pub struct Employee {
     pub id: i32,
     pub name: String,
@@ -14,7 +15,7 @@ pub struct Employee {
 
 impl Employee {
     // Fetch an employee by ID
-    pub async fn find_by_id(pool: &sqlx::PgPool, emp_id: i32) -> Result<Option<Self>, sqlx::Error> {
+    pub async fn find_by_id(pool: &PgPool, emp_id: i32) -> Result<Option<Self>, sqlx::Error> {
         sqlx::query_as!(
             Employee,
             r#"
@@ -26,8 +27,8 @@ impl Employee {
         .await
     }
 
-    // Fetch all employees (this can be paged and optimized further as needed)
-    pub async fn find_all(pool: &sqlx::PgPool) -> Result<Vec<Self>, sqlx::Error> {
+    // Fetch all employees
+    pub async fn find_all(pool: &PgPool) -> Result<Vec<Self>, sqlx::Error> {
         sqlx::query_as!(
             Employee,
             r#"
@@ -40,7 +41,7 @@ impl Employee {
 
     // Insert a new Employee
     pub async fn create(
-        pool: &sqlx::PgPool,
+        pool: &PgPool,
         name: &str,
         role_id: Option<i32>,
         team_id: Option<i32>,
@@ -62,7 +63,7 @@ impl Employee {
 
     // Update an existing Employee by ID
     pub async fn update(
-        pool: &sqlx::PgPool,
+        pool: &PgPool,
         id: i32,
         name: &str,
         role_id: Option<i32>,
@@ -86,7 +87,7 @@ impl Employee {
     }
 
     // Delete an Employee by ID
-    pub async fn delete(pool: &sqlx::PgPool, id: i32) -> Result<u64, sqlx::Error> {
+    pub async fn delete(pool: &PgPool, id: i32) -> Result<u64, sqlx::Error> {
         sqlx::query!(
             r#"
             DELETE FROM employees WHERE id = $1
