@@ -88,6 +88,7 @@ dependencies = [
  "async-trait",
  "base64 0.13.1",
  "bytes",
+ "chrono",
  "fast_chemail",
  "fnv",
  "futures-util",
@@ -275,15 +276,13 @@ dependencies = [
  "async-graphql",
  "async-graphql-axum",
  "axum",
- "dotenv",
- "futures",
+ "chrono",
  "futures-util",
  "sqlx",
- "sqlx-core",
  "thiserror",
  "tokio",
  "tokio-stream",
- "uuid",
+ "tower",
 ]
 
 [[package]]
@@ -318,17 +317,6 @@ name = "base64ct"
 version = "1.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8c3c1a368f70d6cf7302d78f8f7093da241fb8e8807c05cc9e51a125895a6d5b"
-
-[[package]]
-name = "bigdecimal"
-version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a6773ddc0eafc0e509fb60e48dff7f450f8e674a0686ae8605e8d9901bd5eefa"
-dependencies = [
- "num-bigint",
- "num-integer",
- "num-traits",
-]
 
 [[package]]
 name = "bitflags"
@@ -398,7 +386,9 @@ checksum = "7f2c685bad3eb3d45a01354cedb7d5faa66194d1d58ba6e267a8de788f79db38"
 dependencies = [
  "android-tzdata",
  "iana-time-zone",
+ "js-sys",
  "num-traits",
+ "wasm-bindgen",
  "windows-targets",
 ]
 
@@ -530,6 +520,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "deranged"
+version = "0.3.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f2696e8a945f658fd14dc3b87242e6b80cd0f36ff04ea560fa39082368847946"
+
+[[package]]
 name = "digest"
 version = "0.10.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -540,12 +536,6 @@ dependencies = [
  "crypto-common",
  "subtle",
 ]
-
-[[package]]
-name = "dotenv"
-version = "0.15.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "77c90badedccf4105eca100756a0b1289e191f6fcbdadd3cee1d2f614f97da8f"
 
 [[package]]
 name = "dotenvy"
@@ -667,21 +657,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "futures"
-version = "0.3.28"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "23342abe12aba583913b2e62f22225ff9c950774065e4bfb61a19cd9770fec40"
-dependencies = [
- "futures-channel",
- "futures-core",
- "futures-executor",
- "futures-io",
- "futures-sink",
- "futures-task",
- "futures-util",
-]
-
-[[package]]
 name = "futures-channel"
 version = "0.3.28"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -754,7 +729,6 @@ version = "0.3.28"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "26b01e40b772d54cf6c6d721c1d1abd0647a0106a12ecaa1c186273392a69533"
 dependencies = [
- "futures-channel",
  "futures-core",
  "futures-io",
  "futures-macro",
@@ -1181,17 +1155,6 @@ checksum = "d273983c5a657a70a3e8f2a01329822f3b8c8172b73826411a55751e404a0a4a"
 dependencies = [
  "memchr",
  "minimal-lexical",
-]
-
-[[package]]
-name = "num-bigint"
-version = "0.4.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "608e7659b5c3d7cba262d894801b9ec9d00de989e8a82bd4bef91d08da45cdc0"
-dependencies = [
- "autocfg",
- "num-integer",
- "num-traits",
 ]
 
 [[package]]
@@ -1847,7 +1810,6 @@ checksum = "8d6753e460c998bbd4cd8c6f0ed9a64346fcca0723d6e75e52fdc351c5d2169d"
 dependencies = [
  "ahash",
  "atoi",
- "bigdecimal",
  "byteorder",
  "bytes",
  "chrono",
@@ -1876,11 +1838,11 @@ dependencies = [
  "smallvec",
  "sqlformat",
  "thiserror",
+ "time",
  "tokio",
  "tokio-stream",
  "tracing",
  "url",
- "uuid",
 ]
 
 [[package]]
@@ -1933,6 +1895,7 @@ dependencies = [
  "bitflags 2.4.1",
  "byteorder",
  "bytes",
+ "chrono",
  "crc",
  "digest",
  "dotenvy",
@@ -1960,6 +1923,7 @@ dependencies = [
  "sqlx-core",
  "stringprep",
  "thiserror",
+ "time",
  "tracing",
  "whoami",
 ]
@@ -1974,6 +1938,7 @@ dependencies = [
  "base64 0.21.4",
  "bitflags 2.4.1",
  "byteorder",
+ "chrono",
  "crc",
  "dotenvy",
  "etcetera",
@@ -1999,6 +1964,7 @@ dependencies = [
  "sqlx-core",
  "stringprep",
  "thiserror",
+ "time",
  "tracing",
  "whoami",
 ]
@@ -2010,6 +1976,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d59dc83cf45d89c555a577694534fcd1b55c545a816c816ce51f20bbe56a4f3f"
 dependencies = [
  "atoi",
+ "chrono",
  "flume",
  "futures-channel",
  "futures-core",
@@ -2021,6 +1988,7 @@ dependencies = [
  "percent-encoding",
  "serde",
  "sqlx-core",
+ "time",
  "tracing",
  "url",
 ]
@@ -2135,6 +2103,34 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.38",
+]
+
+[[package]]
+name = "time"
+version = "0.3.29"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "426f806f4089c493dcac0d24c29c01e2c38baf8e30f1b716ee37e83d200b18fe"
+dependencies = [
+ "deranged",
+ "itoa",
+ "serde",
+ "time-core",
+ "time-macros",
+]
+
+[[package]]
+name = "time-core"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ef927ca75afb808a4d64dd374f00a2adf8d0fcff8e7b184af886c3c87ec4a3f3"
+
+[[package]]
+name = "time-macros"
+version = "0.2.15"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4ad70d68dba9e1f8aceda7aa6711965dfec1cac869f311a51bd08b3a2ccbce20"
+dependencies = [
+ "time-core",
 ]
 
 [[package]]
@@ -2382,15 +2378,6 @@ name = "utf-8"
 version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "09cc8ee72d2a9becf2f2febe0205bbed8fc6615b7cb429ad062dc7b7ddd036a9"
-
-[[package]]
-name = "uuid"
-version = "1.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "88ad59a7560b41a70d191093a945f0b87bc1deeda46fb237479708a1d6b6cdfc"
-dependencies = [
- "getrandom",
-]
 
 [[package]]
 name = "vcpkg"
