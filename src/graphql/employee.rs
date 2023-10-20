@@ -3,6 +3,7 @@ use sqlx::PgPool;
 
 use crate::models::employee::Employee as EmployeeModel;
 
+#[derive(Default)]
 pub struct EmployeeQuery;
 
 #[Object]
@@ -19,6 +20,7 @@ impl EmployeeQuery {
     }
 }
 
+#[derive(Default)]
 pub struct EmployeeMutation;
 
 #[Object]
