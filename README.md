@@ -1,4 +1,4 @@
-# Axum-start
+# axum-start
 
 ## Local
 
@@ -37,7 +37,7 @@ sqlx migrate add <name>
 sqlx migrate run
 ```
 
-* reference: https://github.com/launchbadge/sqlx/blob/main/sqlx-cli/README.md
+- reference: https://github.com/launchbadge/sqlx/blob/main/sqlx-cli/README.md
 
 ### Offline Mode
 
@@ -76,6 +76,7 @@ cargo sqlx prepare
 이정도.
 
 몇 가지 남은점은
+
 - subscription: graphql subscription 을 쓰러면 그에 맞게 pubsub 이 필요한데 고민중인다. sns 를 써도 되고 redis 를 써도 되는데 그에 맞게 구현하면 될 것 같다.
 - auth: auth 의 폭이 아주 넓지 않은데 그래도 존재하는거 같은데 아직 돌아보지 못했다. 일단 db 에 auth 구현해서 async-graphql 의 guard 를 써보려고 한다. Field guard 인데 apollo 등에서도 많이들 쓰이고 해서 통합해서 쓸 때 편하다.
 
