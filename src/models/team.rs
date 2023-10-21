@@ -1,8 +1,10 @@
+use super::client::Client;
 use async_graphql::SimpleObject;
 use chrono::NaiveDateTime;
 use sqlx::{FromRow, PgPool};
 
 #[derive(FromRow, SimpleObject, Debug)]
+#[graphql(complex)]
 pub struct Team {
     pub id: i32,
     pub name: String,
@@ -49,5 +51,17 @@ impl Team {
             .execute(pool)
             .await
             .map(|result| result.rows_affected())
+    }
+
+    pub async fn get_clients(&self, pool: &PgPool) -> Result<Vec<Client>, sqlx::Error> {
+        sqlx::query_as!(
+            Client,
+            r#"
+            SELECT * FROM clients WHERE team_id = $1
+            "#,
+            self.id
+        )
+        .fetch_all(pool)
+        .await
     }
 }

@@ -149,4 +149,39 @@ impl Employee {
 
         Ok(())
     }
+
+    pub async fn assign_to_team(
+        pool: &PgPool,
+        employee_id: i32,
+        team_id: i32,
+    ) -> Result<Self, sqlx::Error> {
+        sqlx::query_as!(
+            Employee,
+            r#"
+            UPDATE employees
+            SET team_id = $2, updated_at = NOW()
+            WHERE id = $1
+            RETURNING *;
+            "#,
+            employee_id,
+            team_id
+        )
+        .fetch_one(pool)
+        .await
+    }
+
+    pub async fn remove_from_team(pool: &PgPool, employee_id: i32) -> Result<(), sqlx::Error> {
+        sqlx::query!(
+            r#"
+            UPDATE employees
+            SET team_id = NULL
+            WHERE id = $1;
+            "#,
+            employee_id
+        )
+        .execute(pool)
+        .await?;
+
+        Ok(())
+    }
 }

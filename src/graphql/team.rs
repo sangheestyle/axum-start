@@ -1,6 +1,14 @@
-use crate::models::team::Team;
-use async_graphql::{Context, Object};
+use crate::models::{client::Client, team::Team};
+use async_graphql::{ComplexObject, Context, Object};
 use sqlx::PgPool;
+
+#[ComplexObject]
+impl Team {
+    async fn clients(&self, ctx: &Context<'_>) -> async_graphql::Result<Vec<Client>> {
+        let pool = ctx.data::<PgPool>()?;
+        Ok(self.get_clients(&pool).await?)
+    }
+}
 
 #[derive(Default)]
 pub struct TeamQuery;

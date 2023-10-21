@@ -86,4 +86,20 @@ impl EmployeeMutation {
             .map_err(|e| async_graphql::Error::from(e))?;
         Ok(true)
     }
+
+    async fn assign_employee_to_team(
+        &self,
+        ctx: &Context<'_>,
+        employee_id: i32,
+        team_id: i32,
+    ) -> Result<Employee> {
+        let pool = ctx.data::<PgPool>()?;
+        Ok(Employee::assign_to_team(&pool, employee_id, team_id).await?)
+    }
+
+    async fn remove_employee_from_team(&self, ctx: &Context<'_>, employee_id: i32) -> Result<bool> {
+        let pool = ctx.data::<PgPool>()?;
+        Employee::remove_from_team(&pool, employee_id).await?;
+        Ok(true)
+    }
 }
