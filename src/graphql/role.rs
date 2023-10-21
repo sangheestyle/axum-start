@@ -1,7 +1,26 @@
-use async_graphql::{Context, Object};
+use crate::models::{permission::Permission, role::Role, role_permission::RolePermission};
+
+use async_graphql::{ComplexObject, Context, Object, Result};
 use sqlx::PgPool;
 
-use crate::models::role::Role;
+#[ComplexObject]
+impl Role {
+    async fn permissions(&self, ctx: &Context<'_>) -> Result<Vec<Permission>> {
+        // TODO: optimize query
+        let pool = ctx.data::<PgPool>()?;
+        let permission_ids = RolePermission::permissions_by_role(&pool, self.id).await?;
+
+        let mut permissions = Vec::new();
+
+        for pid in permission_ids {
+            if let Some(permission) = Permission::find_by_id(&pool, pid).await? {
+                permissions.push(permission);
+            }
+        }
+
+        Ok(permissions)
+    }
+}
 
 #[derive(Default)]
 pub struct RoleQuery;
@@ -52,5 +71,15 @@ impl RoleMutation {
     async fn delete_role(&self, ctx: &Context<'_>, id: i32) -> async_graphql::Result<u64> {
         let pool = ctx.data::<PgPool>()?;
         Ok(Role::delete(&pool, id).await?)
+    }
+
+    async fn add_permissions_to_role(
+        &self,
+        ctx: &Context<'_>,
+        role_id: i32,
+        permission_ids: Vec<i32>,
+    ) -> async_graphql::Result<u64> {
+        let pool = ctx.data::<PgPool>()?;
+        Ok(RolePermission::assign_permissions_to_role(&pool, role_id, &permission_ids).await?)
     }
 }

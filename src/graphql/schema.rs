@@ -1,13 +1,14 @@
 use crate::graphql::employee::{EmployeeMutation, EmployeeQuery};
+use crate::graphql::permission::{PermissionMutation, PermissionQuery};
 use crate::graphql::role::{RoleMutation, RoleQuery};
 
 use async_graphql::{EmptySubscription, MergedObject, Schema};
 
 #[derive(MergedObject, Default)]
-pub struct QueryRoot(EmployeeQuery, RoleQuery);
+pub struct QueryRoot(EmployeeQuery, RoleQuery, PermissionQuery);
 
 #[derive(MergedObject, Default)]
-pub struct MutationRoot(EmployeeMutation, RoleMutation);
+pub struct MutationRoot(EmployeeMutation, RoleMutation, PermissionMutation);
 
 pub type AppSchema = Schema<QueryRoot, MutationRoot, EmptySubscription>;
 

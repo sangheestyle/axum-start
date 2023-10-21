@@ -1,5 +1,4 @@
-use crate::models::employee::Employee;
-use crate::models::role::Role;
+use crate::models::{employee::Employee, role::Role};
 
 use async_graphql::*;
 use sqlx::PgPool;
@@ -63,5 +62,15 @@ impl EmployeeMutation {
     async fn delete_employee(&self, ctx: &Context<'_>, id: i32) -> Result<u64> {
         let pool = ctx.data::<PgPool>()?;
         Ok(Employee::delete(&pool, id).await?)
+    }
+
+    async fn assign_role_to_employee(
+        &self,
+        ctx: &Context<'_>,
+        employee_id: i32,
+        role_id: i32,
+    ) -> async_graphql::Result<Employee> {
+        let pool = ctx.data::<PgPool>()?;
+        Ok(Employee::assign_role(&pool, employee_id, role_id).await?)
     }
 }

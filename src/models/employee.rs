@@ -98,4 +98,24 @@ impl Employee {
         .await
         .map(|result| result.rows_affected())
     }
+
+    pub async fn assign_role(
+        pool: &PgPool,
+        employee_id: i32,
+        role_id: i32,
+    ) -> Result<Self, sqlx::Error> {
+        sqlx::query_as!(
+            Employee,
+            r#"
+            UPDATE employees
+            SET role_id = $2
+            WHERE id = $1
+            RETURNING *;
+            "#,
+            employee_id,
+            role_id
+        )
+        .fetch_one(pool)
+        .await
+    }
 }
