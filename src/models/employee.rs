@@ -134,4 +134,19 @@ impl Employee {
         .fetch_one(pool)
         .await
     }
+
+    pub async fn remove_role(pool: &PgPool, employee_id: i32) -> Result<(), sqlx::Error> {
+        sqlx::query!(
+            r#"
+            UPDATE employees
+            SET role_id = NULL
+            WHERE id = $1;
+            "#,
+            employee_id
+        )
+        .execute(pool)
+        .await?;
+
+        Ok(())
+    }
 }

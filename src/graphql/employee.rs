@@ -74,4 +74,16 @@ impl EmployeeMutation {
         let pool = ctx.data::<PgPool>()?;
         Ok(Employee::assign_role(&pool, employee_id, role_id).await?)
     }
+
+    async fn remove_role_from_employee(
+        &self,
+        ctx: &Context<'_>,
+        employee_id: i32,
+    ) -> async_graphql::Result<bool> {
+        let pool = ctx.data::<PgPool>()?;
+        Employee::remove_role(&pool, employee_id)
+            .await
+            .map_err(|e| async_graphql::Error::from(e))?;
+        Ok(true)
+    }
 }
