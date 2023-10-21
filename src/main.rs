@@ -10,13 +10,14 @@ use axum::{
     Router, Server,
 };
 use graphql::schema::create_schema;
-use std::iter::once;
+use std::{iter::once, time::Duration};
 use tower::ServiceBuilder;
 use tower_http::{
     compression::CompressionLayer,
     cors::{Any, CorsLayer},
     propagate_header::PropagateHeaderLayer,
     sensitive_headers::SetSensitiveRequestHeadersLayer,
+    timeout::TimeoutLayer,
     trace::TraceLayer,
 };
 use tracing_subscriber::fmt;
@@ -51,6 +52,7 @@ async fn main() {
                 .layer(SetSensitiveRequestHeadersLayer::new(once(AUTHORIZATION)))
                 // High level logging of requests and responses
                 .layer(TraceLayer::new_for_http())
+                .layer(TimeoutLayer::new(Duration::from_secs(10)))
                 .layer(CompressionLayer::new())
                 .layer(PropagateHeaderLayer::new(HeaderName::from_static(
                     "x-request-id",
