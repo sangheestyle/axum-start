@@ -1,17 +1,18 @@
-use crate::models::{employee::Employee, role::Role};
+use crate::models::{employee::Employee, role::Role, team::Team};
 
 use async_graphql::*;
 use sqlx::PgPool;
 
 #[ComplexObject]
 impl Employee {
+    async fn team(&self, ctx: &Context<'_>) -> Result<Option<Team>> {
+        let pool = ctx.data::<PgPool>()?;
+        self.get_team(&pool).await.map_err(Into::into)
+    }
+
     async fn role(&self, ctx: &Context<'_>) -> Result<Option<Role>> {
-        if let Some(role_id) = self.role_id {
-            let pool = ctx.data::<PgPool>()?;
-            Ok(Role::find_by_id(&pool, role_id).await?)
-        } else {
-            Ok(None)
-        }
+        let pool = ctx.data::<PgPool>()?;
+        self.get_role(&pool).await.map_err(Into::into)
     }
 }
 

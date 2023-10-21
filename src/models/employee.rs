@@ -2,6 +2,8 @@ use async_graphql::SimpleObject;
 use chrono::NaiveDateTime;
 use sqlx::{FromRow, PgPool};
 
+use super::{role::Role, team::Team};
+
 #[derive(FromRow, SimpleObject, Debug)]
 #[graphql(complex)]
 pub struct Employee {
@@ -97,6 +99,20 @@ impl Employee {
         .execute(pool)
         .await
         .map(|result| result.rows_affected())
+    }
+
+    pub async fn get_team(&self, pool: &PgPool) -> Result<Option<Team>, sqlx::Error> {
+        match self.team_id {
+            Some(tid) => Team::find_by_id(pool, tid).await,
+            None => Ok(None),
+        }
+    }
+
+    pub async fn get_role(&self, pool: &PgPool) -> Result<Option<Role>, sqlx::Error> {
+        match self.role_id {
+            Some(rid) => Role::find_by_id(pool, rid).await,
+            None => Ok(None),
+        }
     }
 
     pub async fn assign_role(
