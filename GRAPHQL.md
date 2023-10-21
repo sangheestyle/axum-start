@@ -210,3 +210,13 @@ mutation {
   }
 }
 ```
+
+### employee 에게 role 할당될 때 알림 받기 위한 subscription
+
+subscription 부분은 더 구현이 되어야 함
+
+```graphql
+subscription {
+  roleAssignedToEmployee
+}
+```

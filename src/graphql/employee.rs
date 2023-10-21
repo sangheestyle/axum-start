@@ -1,7 +1,11 @@
 use crate::models::{employee::Employee, role::Role, team::Team};
 
 use async_graphql::*;
+use futures_util::Stream;
+use redis::AsyncCommands;
 use sqlx::PgPool;
+
+use futures_util::StreamExt;
 
 #[ComplexObject]
 impl Employee {
@@ -72,7 +76,18 @@ impl EmployeeMutation {
         role_id: i32,
     ) -> async_graphql::Result<Employee> {
         let pool = ctx.data::<PgPool>()?;
-        Ok(Employee::assign_role(&pool, employee_id, role_id).await?)
+        let result = Employee::assign_role(&pool, employee_id, role_id).await?;
+
+        // Redis PubSub
+        let redis_client: &redis::Client = ctx.data()?;
+        let mut conn = redis_client.get_async_connection().await?;
+        conn.publish(
+            "assign_role_to_employee",
+            format!("Role {} assigned to Employee {}", role_id, employee_id),
+        )
+        .await?;
+
+        Ok(result)
     }
 
     async fn remove_role_from_employee(
@@ -101,5 +116,22 @@ impl EmployeeMutation {
         let pool = ctx.data::<PgPool>()?;
         Employee::remove_from_team(&pool, employee_id).await?;
         Ok(true)
+    }
+}
+
+#[derive(Default)]
+pub struct EmployeeSubscription;
+
+#[Subscription]
+impl EmployeeSubscription {
+    async fn role_assigned_to_employee(&self, ctx: &Context<'_>) -> impl Stream<Item = String> {
+        let redis_client: &redis::Client = ctx.data().unwrap();
+        let conn = redis_client.get_async_connection().await.unwrap();
+        let mut pubsub = conn.into_pubsub();
+        pubsub.subscribe("assign_role_to_employee").await.unwrap();
+        pubsub.into_on_message().map(|msg| {
+            let payload: String = msg.get_payload().unwrap();
+            payload
+        })
     }
 }

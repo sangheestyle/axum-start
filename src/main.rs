@@ -39,8 +39,10 @@ async fn main() {
     let pool = sqlx::PgPool::connect(&database_url)
         .await
         .expect("Failed to create pool.");
+    let redis_client =
+        redis::Client::open("redis://127.0.0.1/").expect("Failed to create Redis client.");
 
-    let schema = create_schema(pool);
+    let schema = create_schema(pool, redis_client.clone());
 
     let app = Router::new()
         .route("/graphiql", get(graphiql))
