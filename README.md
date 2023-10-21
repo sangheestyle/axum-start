@@ -6,6 +6,12 @@
 cargo run
 ```
 
+check .env file for tracing env and etc otherwise do the following for tracing.
+
+```
+RUST_LOG=tower_http=trace cargo run
+```
+
 ## Docker
 
 ```

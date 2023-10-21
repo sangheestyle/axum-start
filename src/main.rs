@@ -8,10 +8,11 @@ use axum::{
     routing::{get, post_service},
     Router, Server,
 };
+use tracing_subscriber::fmt;
 
 use graphql::schema::create_schema;
 use tower::ServiceBuilder;
-use tower_http::compression::CompressionLayer;
+use tower_http::{compression::CompressionLayer, trace::TraceLayer};
 
 async fn graphiql() -> impl IntoResponse {
     response::Html(
@@ -24,6 +25,8 @@ async fn graphiql() -> impl IntoResponse {
 
 #[tokio::main]
 async fn main() {
+    fmt::init();
+
     let database_url = "postgres://sanghee@localhost:5432/axum";
     let pool = sqlx::PgPool::connect(&database_url)
         .await
@@ -35,7 +38,11 @@ async fn main() {
         .route("/graphiql", get(graphiql))
         .route("/graphql", post_service(GraphQL::new(schema.clone())))
         .route_service("/ws", GraphQLSubscription::new(schema))
-        .layer(ServiceBuilder::new().layer(CompressionLayer::new()));
+        .layer(
+            ServiceBuilder::new()
+                .layer(CompressionLayer::new())
+                .layer(TraceLayer::new_for_http()),
+        );
 
     println!("GraphiQL: http://localhost:8000/graphiql");
 
