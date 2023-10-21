@@ -70,6 +70,7 @@ cargo sqlx prepare
 ## Reference
 
 - [distroless](https://github.com/GoogleContainerTools/distroless/blob/main/examples/rust/Dockerfile)
+- https://github.com/tokio-rs/axum/blob/main/ECOSYSTEM.md
 
 ## Stack
 
