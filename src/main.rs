@@ -4,15 +4,22 @@ mod models;
 use async_graphql::http::GraphiQLSource;
 use async_graphql_axum::{GraphQL, GraphQLSubscription};
 use axum::{
+    http::{header::AUTHORIZATION, HeaderName, Method},
     response::{self, IntoResponse},
     routing::{get, post_service},
     Router, Server,
 };
-use tracing_subscriber::fmt;
-
 use graphql::schema::create_schema;
+use std::iter::once;
 use tower::ServiceBuilder;
-use tower_http::{compression::CompressionLayer, trace::TraceLayer};
+use tower_http::{
+    compression::CompressionLayer,
+    cors::{Any, CorsLayer},
+    propagate_header::PropagateHeaderLayer,
+    sensitive_headers::SetSensitiveRequestHeadersLayer,
+    trace::TraceLayer,
+};
+use tracing_subscriber::fmt;
 
 async fn graphiql() -> impl IntoResponse {
     response::Html(
@@ -40,8 +47,19 @@ async fn main() {
         .route_service("/ws", GraphQLSubscription::new(schema))
         .layer(
             ServiceBuilder::new()
+                // Mark the `Authorization` request header as sensitive so it doesn't show in logs
+                .layer(SetSensitiveRequestHeadersLayer::new(once(AUTHORIZATION)))
+                // High level logging of requests and responses
+                .layer(TraceLayer::new_for_http())
                 .layer(CompressionLayer::new())
-                .layer(TraceLayer::new_for_http()),
+                .layer(PropagateHeaderLayer::new(HeaderName::from_static(
+                    "x-request-id",
+                )))
+                .layer(
+                    CorsLayer::new()
+                        .allow_methods([Method::GET, Method::POST])
+                        .allow_origin(Any),
+                ),
         );
 
     println!("GraphiQL: http://localhost:8000/graphiql");
