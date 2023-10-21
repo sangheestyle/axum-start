@@ -10,6 +10,8 @@ use axum::{
 };
 
 use graphql::schema::create_schema;
+use tower::ServiceBuilder;
+use tower_http::compression::CompressionLayer;
 
 async fn graphiql() -> impl IntoResponse {
     response::Html(
@@ -32,7 +34,8 @@ async fn main() {
     let app = Router::new()
         .route("/graphiql", get(graphiql))
         .route("/graphql", post_service(GraphQL::new(schema.clone())))
-        .route_service("/ws", GraphQLSubscription::new(schema));
+        .route_service("/ws", GraphQLSubscription::new(schema))
+        .layer(ServiceBuilder::new().layer(CompressionLayer::new()));
 
     println!("GraphiQL: http://localhost:8000/graphiql");
 

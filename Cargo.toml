@@ -12,5 +12,6 @@ sqlx = { version = "0.7.1", features = ["runtime-tokio", "tls-native-tls", "post
 thiserror = "1.0.49"
 tokio-stream = "0.1.14"
 futures-util = "0.3.28"
-tower = "0.4.13"
 chrono = "0.4.31"
+tower = "0.4.13"
+tower-http = {version ="0.4.4", features = ["full"]}
