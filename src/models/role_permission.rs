@@ -24,6 +24,26 @@ impl RolePermission {
         .map(|rows| rows.into_iter().map(|row| row.permission_id).collect())
     }
 
+    pub async fn remove_permissions_from_role(
+        pool: &PgPool,
+        role_id: i32,
+        permission_ids: &[i32],
+    ) -> Result<u64, sqlx::Error> {
+        let affected = sqlx::query!(
+            r#"
+            DELETE FROM role_permissions
+            WHERE role_id = $1 AND permission_id = ANY($2)
+            "#,
+            role_id,
+            &permission_ids
+        )
+        .execute(pool)
+        .await?
+        .rows_affected();
+
+        Ok(affected)
+    }
+
     // Fetch roles by permission ID
     pub async fn roles_by_permission(
         pool: &PgPool,

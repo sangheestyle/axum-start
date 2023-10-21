@@ -82,4 +82,14 @@ impl RoleMutation {
         let pool = ctx.data::<PgPool>()?;
         Ok(RolePermission::assign_permissions_to_role(&pool, role_id, &permission_ids).await?)
     }
+
+    async fn remove_permissions_from_role(
+        &self,
+        ctx: &Context<'_>,
+        role_id: i32,
+        permission_ids: Vec<i32>,
+    ) -> async_graphql::Result<u64> {
+        let pool = ctx.data::<PgPool>()?;
+        Ok(RolePermission::remove_permissions_from_role(&pool, role_id, &permission_ids).await?)
+    }
 }
