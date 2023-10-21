@@ -68,11 +68,10 @@ ping
 ## TODO
 
 - .env 되도록 고치고
-- todo 대신에 employee 에 대한 것으로 변경
-- subscription 이 지금은 안됨 - 고쳐야함 필요할 때, broker 문제임
-- DB migration 초기부터 어떻게 하는지 고민해야함
 - graphql logger 등 추가
-- auth 추가 https://async-graphql.github.io/async-graphql/en/utilities.html
+- auth 추가
+  - https://async-graphql.github.io/async-graphql/en/utilities.html
+  - https://github.com/maxcountryman/axum-login
 - docker build 가 느림
 - cdk 추가
 
