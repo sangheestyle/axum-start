@@ -142,8 +142,7 @@ impl EmployeeSubscription {
         let mut pubsub = conn.into_pubsub();
         pubsub.subscribe("assign_role_to_employee").await.unwrap();
         pubsub.into_on_message().map(|msg| {
-            let payload: String = msg.get_payload().unwrap();
-            payload
+            msg.get_payload().unwrap()
         })
     }
 }
