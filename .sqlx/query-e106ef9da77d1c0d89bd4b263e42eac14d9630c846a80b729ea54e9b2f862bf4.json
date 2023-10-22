@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE employees\n            SET team_id = NULL\n            WHERE id = $1;\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "e106ef9da77d1c0d89bd4b263e42eac14d9630c846a80b729ea54e9b2f862bf4"
+}

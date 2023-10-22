@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                INSERT INTO role_permissions (role_id, permission_id)\n                VALUES ($1, $2)\n                ON CONFLICT (role_id, permission_id) DO NOTHING\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "8a4014b51f665695d87dbb522d6b55a57c24e68104bcdcd52bef2c36127fc0b0"
+}
