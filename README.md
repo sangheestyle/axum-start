@@ -103,3 +103,50 @@ ping
 - auth: auth 의 폭이 아주 넓지 않은데 그래도 존재하는거 같은데 아직 돌아보지 못했다. 일단 db 에 auth 구현해서 async-graphql 의 guard 를 써보려고 한다. Field guard 인데 apollo 등에서도 많이들 쓰이고 해서 통합해서 쓸 때 편하다.
 
 https://async-graphql.github.io/async-graphql/en/field_guard.html
+
+## Auth
+
+### signup
+
+```
+curl -X POST http://localhost:8000/signup -H "Content-Type: application/x-www-form-urlencoded" \
+--data-urlencode "name=John Doe" \
+--data-urlencode "email=johndoe@example.com" \
+--data-urlencode "password=your_password_here"
+```
+
+### login
+
+```
+curl -X POST http://localhost:8000/login -H "Content-Type: application/x-www-form-urlencoded" \
+--data-urlencode "email=johndoe@example.com" \
+--data-urlencode "password=your_password_here"
+```
+
+### logout
+
+```
+curl -X POST http://localhost:8000/logout
+```
+
+## GraphQL playground
+
+Please get jwt first. For that, please do sign up and login for obtaining jwt. For example:
+
+```
+% curl -X POST http://localhost:8000/login -H "Content-Type: application/x-www-form-urlencoded" \
+--data-urlencode "email=johndoe@example.com" \
+--data-urlencode "password=your_password_here"
+
+eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiZXhwIjoxNjk4MDY3MTk0fQ.XKidkbycvqAHXvq7Hle_mWaaMy6YH_AtsMaYgd0OaVU
+```
+
+Open http://localhost:8000/graphiql and you will get error. Just click `HTTP HEADERS` on bottom, and copy and paste the following:
+
+```json
+{
+  "Authorization": "YourJWT"
+}
+```
+
+Just reload the browser and everything will be ok.

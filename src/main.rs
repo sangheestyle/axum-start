@@ -6,11 +6,11 @@ use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql_axum::{GraphQL, GraphQLSubscription};
 use axum::{
     http::{header::AUTHORIZATION, HeaderName, Method},
+    middleware,
     response::{self, Html, IntoResponse},
-    routing::{get, post_service},
+    routing::{get, post, post_service},
     Router, Server,
 };
-use graphql::schema::create_schema;
 use serde_json::json;
 use std::{iter::once, time::Duration};
 use tower::ServiceBuilder;
@@ -24,6 +24,10 @@ use tower_http::{
 };
 use tracing_subscriber::fmt;
 
+use auth::jwt::jwt_middleware;
+use auth::login::{login, logout, signup};
+use graphql::schema::create_schema;
+
 async fn graphql_playground() -> impl IntoResponse {
     Html(playground_source(
         GraphQLPlaygroundConfig::new("/graphql").subscription_endpoint("/ws"),
@@ -34,6 +38,12 @@ async fn health_check() -> impl IntoResponse {
     response::Json(json!({
         "status": "Healthy"
     }))
+}
+
+#[derive(Clone)]
+pub struct AppState {
+    pub pool: sqlx::PgPool,
+    // redis_client: redis::Client,
 }
 
 #[tokio::main]
@@ -49,18 +59,22 @@ async fn main() {
         .expect("Failed to create pool.");
     let redis_client = redis::Client::open(redis_url).expect("Failed to create Redis client.");
 
-    let schema = create_schema(pool, redis_client);
+    let schema = create_schema(pool.clone(), redis_client);
+    let state = AppState { pool: pool.clone() };
 
     let app = Router::new()
-        .route("/graphiql", get(graphql_playground))
         .route("/graphql", post_service(GraphQL::new(schema.clone())))
+        .route_layer(middleware::from_fn(jwt_middleware))
+        .route("/signup", post(signup))
+        .route("/login", post(login))
+        .route("/logout", post(logout))
+        .route("/graphiql", get(graphql_playground))
         .route_service("/ws", GraphQLSubscription::new(schema))
         .route("/health", get(health_check))
+        .with_state(state)
         .layer(
             ServiceBuilder::new()
-                // Mark the `Authorization` request header as sensitive so it doesn't show in logs
                 .layer(SetSensitiveRequestHeadersLayer::new(once(AUTHORIZATION)))
-                // High level logging of requests and responses
                 .layer(TraceLayer::new_for_http())
                 .layer(TimeoutLayer::new(Duration::from_secs(10)))
                 .layer(CompressionLayer::new())

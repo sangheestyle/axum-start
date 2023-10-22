@@ -1,51 +1,87 @@
-use crate::auth::hashing::verify_password;
+use crate::auth::hashing::{generate_salt, hash_password, verify_password};
+use crate::auth::jwt::create_token;
 use crate::models::employee::Employee;
-use axum::{extract::Extension, response, BoxError, Json};
+use crate::AppState;
+use axum::{extract::State, http::StatusCode, response::IntoResponse, Form};
 use serde::Deserialize;
-use serde_json::json;
-use sqlx::PgPool;
+
+use super::jwt::Claims;
 
 #[derive(Deserialize)]
-pub struct LoginRequest {
-    pub username: String,
+pub struct SignupInput {
+    pub name: String,
+    pub email: String,
     pub password: String,
 }
 
-pub async fn login(
-    Extension(pool): Extension<PgPool>,
-    Json(body): axum::extract::Json<LoginRequest>,
-) -> Result<response::Json<serde_json::Value>, BoxError> {
-    let user_result = Employee::find_by_username(&pool, &body.username).await;
+#[derive(Deserialize)]
+pub struct LoginInput {
+    pub email: String,
+    pub password: String,
+}
 
-    match user_result {
-        Ok(Some(user)) => {
-            if verify_password(&body.password, &user.password_hash, &user.salt) {
-                let claims = crate::auth::jwt::Claims::new(user.id.to_string());
-                let token = match crate::auth::jwt::create_token(claims) {
-                    Ok(t) => t,
-                    Err(e) => {
-                        return Err(Box::new(std::io::Error::new(
-                            std::io::ErrorKind::Other,
-                            format!("Token creation error: {}", e),
-                        )))
-                    }
-                };
-                Ok(response::Json(json!({"token": token})))
+pub async fn signup(
+    State(state): State<AppState>,
+    Form(data): Form<SignupInput>,
+) -> impl IntoResponse {
+    // Check if a user with the given email already exists
+    let existing_employee = Employee::find_by_username(&state.pool, &data.email)
+        .await
+        .unwrap_or(None);
+    if existing_employee.is_some() {
+        return (
+            StatusCode::BAD_REQUEST,
+            "A user with this email already exists.",
+        );
+    }
+
+    let salt = generate_salt();
+    let hashed_password = hash_password(&data.password, &salt);
+
+    // Create a new employee
+    let _ = Employee::create(
+        &state.pool,
+        &data.name,
+        &data.email,
+        &hashed_password,
+        &salt,
+        None, // role_id
+        None, // team_id
+    )
+    .await;
+
+    (StatusCode::OK, "User registered successfully.")
+}
+
+pub async fn login(
+    State(state): State<AppState>,
+    Form(data): Form<LoginInput>,
+) -> impl IntoResponse {
+    let employee = Employee::find_by_username(&state.pool, &data.email)
+        .await
+        .unwrap_or(None);
+
+    match employee {
+        Some(emp) => {
+            if verify_password(&data.password, &emp.password_hash, &emp.salt) {
+                let claims = Claims::new(emp.id.to_string());
+                match create_token(claims) {
+                    Ok(token) => (StatusCode::OK, token),
+                    Err(_) => (
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        "Failed to create token.".to_string(),
+                    ),
+                }
             } else {
-                Err(Box::new(std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    "Invalid password",
-                )))
+                (StatusCode::UNAUTHORIZED, "Incorrect password.".to_string())
             }
         }
-        Ok(None) => Err(Box::new(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            "User not found",
-        ))),
-        Err(e) => Err(Box::new(std::io::Error::new(
-            // Handle database error here
-            std::io::ErrorKind::Other,
-            format!("Database error: {}", e),
-        ))),
+        None => (StatusCode::NOT_FOUND, "Employee not found.".to_string()),
     }
+}
+
+pub async fn logout() -> impl IntoResponse {
+    // As before, this is a simple stub. In a real-world scenario,
+    // you might want to invalidate the token or perform other logout related tasks.
+    (StatusCode::OK, "Logged out successfully.")
 }

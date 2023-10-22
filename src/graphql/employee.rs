@@ -45,11 +45,23 @@ impl EmployeeMutation {
         &self,
         ctx: &Context<'_>,
         name: String,
+        username: String,
+        password_hash: String,
+        salt: String,
         role_id: Option<i32>,
         team_id: Option<i32>,
     ) -> Result<Employee> {
         let pool = ctx.data::<PgPool>()?;
-        Ok(Employee::create(&pool, &name, role_id, team_id).await?)
+        Ok(Employee::create(
+            &pool,
+            &name,
+            &username,
+            &password_hash,
+            &salt,
+            role_id,
+            team_id,
+        )
+        .await?)
     }
 
     async fn update_employee(
