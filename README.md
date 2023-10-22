@@ -2,11 +2,12 @@
 
 ## Local
 
+create .env from .env.example and update it with proper properties i.e., DATABASE_URL, REDIS_URL.
+
 ```
+cargo build
 cargo run
 ```
-
-check .env file for tracing env and etc otherwise do the following for tracing.
 
 ```
 RUST_LOG=tower_http=trace cargo run

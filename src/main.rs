@@ -34,13 +34,15 @@ async fn graphiql() -> impl IntoResponse {
 #[tokio::main]
 async fn main() {
     fmt::init();
+    dotenv::dotenv().ok();
 
-    let database_url = "postgres://sanghee@localhost:5432/axum";
+    let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    let redis_url = std::env::var("REDIS_URL").expect("REDIS_URL must be set");
+
     let pool = sqlx::PgPool::connect(&database_url)
         .await
         .expect("Failed to create pool.");
-    let redis_client =
-        redis::Client::open("redis://127.0.0.1/").expect("Failed to create Redis client.");
+    let redis_client = redis::Client::open(redis_url).expect("Failed to create Redis client.");
 
     let schema = create_schema(pool, redis_client.clone());
 
