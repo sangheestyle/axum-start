@@ -49,7 +49,7 @@ sqlx migrate run
 For restarting postgrsql on mac:
 
 ```
-brew services restart postgresql@1
+brew services restart postgresql@15
 ```
 
 ### Offline Mode
