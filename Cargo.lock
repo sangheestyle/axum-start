@@ -311,6 +311,7 @@ dependencies = [
  "dotenv",
  "futures-util",
  "redis",
+ "serde_json",
  "sqlx",
  "thiserror",
  "tokio",

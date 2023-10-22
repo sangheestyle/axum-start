@@ -10,6 +10,7 @@ use axum::{
     Router, Server,
 };
 use graphql::schema::create_schema;
+use serde_json::json;
 use std::{iter::once, time::Duration};
 use tower::ServiceBuilder;
 use tower_http::{
@@ -31,6 +32,12 @@ async fn graphiql() -> impl IntoResponse {
     )
 }
 
+async fn health_check() -> impl IntoResponse {
+    response::Json(json!({
+        "status": "Healthy"
+    }))
+}
+
 #[tokio::main]
 async fn main() {
     fmt::init();
@@ -50,6 +57,7 @@ async fn main() {
         .route("/graphiql", get(graphiql))
         .route("/graphql", post_service(GraphQL::new(schema.clone())))
         .route_service("/ws", GraphQLSubscription::new(schema))
+        .route("/health", get(health_check))
         .layer(
             ServiceBuilder::new()
                 // Mark the `Authorization` request header as sensitive so it doesn't show in logs
