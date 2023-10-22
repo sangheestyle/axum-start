@@ -48,7 +48,7 @@ async fn main() {
         .expect("Failed to create pool.");
     let redis_client = redis::Client::open(redis_url).expect("Failed to create Redis client.");
 
-    let schema = create_schema(pool, redis_client.clone());
+    let schema = create_schema(pool, redis_client);
 
     let app = Router::new()
         .route("/graphiql", get(graphql_playground))
