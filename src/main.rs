@@ -1,11 +1,11 @@
 mod graphql;
 mod models;
 
-use async_graphql::http::GraphiQLSource;
+use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql_axum::{GraphQL, GraphQLSubscription};
 use axum::{
     http::{header::AUTHORIZATION, HeaderName, Method},
-    response::{self, IntoResponse},
+    response::{self, Html, IntoResponse},
     routing::{get, post_service},
     Router, Server,
 };
@@ -23,13 +23,10 @@ use tower_http::{
 };
 use tracing_subscriber::fmt;
 
-async fn graphiql() -> impl IntoResponse {
-    response::Html(
-        GraphiQLSource::build()
-            .endpoint("/graphql")
-            .subscription_endpoint("/ws")
-            .finish(),
-    )
+async fn graphql_playground() -> impl IntoResponse {
+    Html(playground_source(
+        GraphQLPlaygroundConfig::new("/graphql").subscription_endpoint("/ws"),
+    ))
 }
 
 async fn health_check() -> impl IntoResponse {
@@ -54,7 +51,7 @@ async fn main() {
     let schema = create_schema(pool, redis_client.clone());
 
     let app = Router::new()
-        .route("/graphiql", get(graphiql))
+        .route("/graphiql", get(graphql_playground))
         .route("/graphql", post_service(GraphQL::new(schema.clone())))
         .route_service("/ws", GraphQLSubscription::new(schema))
         .route("/health", get(health_check))
