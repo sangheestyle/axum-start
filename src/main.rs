@@ -1,3 +1,4 @@
+mod auth;
 mod graphql;
 mod models;
 

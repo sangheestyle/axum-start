@@ -15,21 +15,36 @@
       },
       {
         "ordinal": 2,
+        "name": "username",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "password_hash",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "salt",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
         "name": "role_id",
         "type_info": "Int4"
       },
       {
-        "ordinal": 3,
+        "ordinal": 6,
         "name": "team_id",
         "type_info": "Int4"
       },
       {
-        "ordinal": 4,
+        "ordinal": 7,
         "name": "created_at",
         "type_info": "Timestamp"
       },
       {
-        "ordinal": 5,
+        "ordinal": 8,
         "name": "updated_at",
         "type_info": "Timestamp"
       }
@@ -40,6 +55,9 @@
       ]
     },
     "nullable": [
+      false,
+      false,
+      false,
       false,
       false,
       true,

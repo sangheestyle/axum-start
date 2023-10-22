@@ -9,6 +9,9 @@ use super::{role::Role, team::Team};
 pub struct Employee {
     pub id: i32,
     pub name: String,
+    pub username: String,
+    pub password_hash: String,
+    pub salt: String,
     pub role_id: Option<i32>,
     pub team_id: Option<i32>,
     pub created_at: NaiveDateTime,
@@ -24,6 +27,22 @@ impl Employee {
             SELECT * FROM employees WHERE id = $1
             "#,
             emp_id
+        )
+        .fetch_optional(pool)
+        .await
+    }
+
+    // Fetch an employee by username
+    pub async fn find_by_username(
+        pool: &PgPool,
+        username: &str,
+    ) -> Result<Option<Self>, sqlx::Error> {
+        sqlx::query_as!(
+            Employee,
+            r#"
+                SELECT * FROM employees WHERE username = $1
+                "#,
+            username
         )
         .fetch_optional(pool)
         .await
@@ -45,19 +64,25 @@ impl Employee {
     pub async fn create(
         pool: &PgPool,
         name: &str,
+        username: &str,
+        password_hash: &str,
+        salt: &str,
         role_id: Option<i32>,
         team_id: Option<i32>,
     ) -> Result<Self, sqlx::Error> {
         sqlx::query_as!(
             Employee,
             r#"
-            INSERT INTO employees (name, role_id, team_id)
-            VALUES ($1, $2, $3)
+            INSERT INTO employees (name, role_id, team_id, username, password_hash, salt)
+            VALUES ($1, $2, $3, $4, $5, $6)
             RETURNING *;
             "#,
             name,
             role_id,
-            team_id
+            team_id,
+            username,
+            password_hash,
+            salt
         )
         .fetch_one(pool)
         .await

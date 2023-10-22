@@ -46,6 +46,12 @@ sqlx migrate run
 
 - reference: https://github.com/launchbadge/sqlx/blob/main/sqlx-cli/README.md
 
+For restarting postgrsql on mac:
+
+```
+brew services restart postgresql@1
+```
+
 ### Offline Mode
 
 ```

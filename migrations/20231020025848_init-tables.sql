@@ -1,7 +1,7 @@
 -- Create the role table
 CREATE TABLE roles (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NOT NULL UNIQUE,
     description TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -42,16 +42,15 @@ CREATE TABLE clients (
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create the employee table
+-- Create the employee table with authentication fields
 CREATE TABLE employees (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    salt VARCHAR(255) NOT NULL,
     role_id INT REFERENCES roles(id) ON DELETE SET NULL,
     team_id INT REFERENCES teams(id) ON DELETE SET NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-
--- Create indexes or constraints if needed
--- For example, to ensure unique names for roles:
-CREATE UNIQUE INDEX idx_unique_role_name ON roles(name);

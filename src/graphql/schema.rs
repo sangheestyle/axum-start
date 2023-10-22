@@ -1,3 +1,4 @@
+use crate::graphql::auth::AuthMutation;
 use crate::graphql::client::{ClientMutation, ClientQuery};
 use crate::graphql::employee::{EmployeeMutation, EmployeeQuery, EmployeeSubscription};
 use crate::graphql::permission::{PermissionMutation, PermissionQuery};
@@ -22,6 +23,7 @@ pub struct MutationRoot(
     PermissionMutation,
     TeamMutation,
     ClientMutation,
+    AuthMutation,
 );
 
 pub type AppSchema = Schema<QueryRoot, MutationRoot, EmployeeSubscription>;
