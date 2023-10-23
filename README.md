@@ -19,8 +19,8 @@ On my m1 macbook pro,
 
 ```
 # docker on m1 macbook pro for linux/amd64
-docker build --platform linux/amd64 . -t axum-start-linum-amd64
-docker run --platform linux/amd64 -p 8000:8000 --env-file .env.docker.local axum-start-linum-amd64
+docker build --platform linux/amd64 . -t axum-start-linux-amd64
+docker run --platform linux/amd64 -p 8000:8000 --env-file .env.docker.local axum-start-linux-amd64
 
 # docker on m1 macbook pro
 docker build . -t axum-start
@@ -31,8 +31,8 @@ For run the image locally on M1 MacBook from `docker buildx`, use the `--load` f
 
 ### Reference
 
-* https://loige.co/building_x86_rust-containers-from-mac-silicon/
-* https://kerkour.com/rust-small-docker-image
+- https://loige.co/building_x86_rust-containers-from-mac-silicon/
+- https://kerkour.com/rust-small-docker-image
 
 ## DB
 

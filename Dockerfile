@@ -1,8 +1,9 @@
 FROM rust:1.73-slim-buster as builder
 ENV AR_x86_64_unknown_linux_musl=llvm-ar
-RUN apt update && apt install -y musl-tools musl-dev build-essential gcc-x86-64-linux-gnu clang llvm
+RUN apt update && apt install -y --no-install-recommends musl-tools build-essential clang llvm
 RUN update-ca-certificates
 RUN rustup target add x86_64-unknown-linux-musl
+ENV RUST_BACKTRACE=full
 COPY . /app
 RUN \
   --mount=type=cache,target=/app/target,rw \
