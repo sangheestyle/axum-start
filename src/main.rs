@@ -53,6 +53,9 @@ async fn main() {
 
     let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     let redis_url = std::env::var("REDIS_URL").expect("REDIS_URL must be set");
+    let host = std::env::var("HOST").unwrap_or("127.0.0.1".to_string());
+    let port = std::env::var("PORT").unwrap_or("8000".to_string());
+    let address = format!("{}:{}", host, port);
 
     let pool = sqlx::PgPool::connect(&database_url)
         .await
@@ -88,9 +91,8 @@ async fn main() {
                 ),
         );
 
-    println!("GraphiQL: http://localhost:8000/graphiql");
-
-    Server::bind(&"127.0.0.1:8000".parse().unwrap())
+    println!("GraphiQL: http://{}/graphiql", address);
+    Server::bind(&address.parse().unwrap())
         .serve(app.into_make_service())
         .await
         .unwrap();
