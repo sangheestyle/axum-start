@@ -53,7 +53,7 @@ pub async fn jwt_middleware<B>(request: Request<B>, next: Next<B>) -> Response {
         .unwrap_or_else(|| String::new());
 
     match decode_token(&token) {
-        Ok(claims) => {
+        Ok(_claims) => {
             // TODO: add claims to request context
             // If the token is valid, set the claims in the request context
             // let req_with_claims = req.map_data(move |_| claims);
