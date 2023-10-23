@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            INSERT INTO employees (name, role_id, team_id)\n            VALUES ($1, $2, $3)\n            RETURNING *;\n            ",
+  "query": "\n            INSERT INTO employees (name, role_id, team_id, username, password_hash, salt)\n            VALUES ($1, $2, $3, $4, $5, $6)\n            RETURNING *;\n            ",
   "describe": {
     "columns": [
       {
@@ -53,7 +53,10 @@
       "Left": [
         "Varchar",
         "Int4",
-        "Int4"
+        "Int4",
+        "Varchar",
+        "Varchar",
+        "Varchar"
       ]
     },
     "nullable": [
@@ -68,5 +71,5 @@
       false
     ]
   },
-  "hash": "c52b8712e77eff30cf426f21510eb619e3fce99c9d2442540497a79e69b90488"
+  "hash": "facbc4a68ff5a1626908b25c15afa34198f69e5a1ce7c8fcaf1f37fb590433fa"
 }
