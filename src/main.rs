@@ -28,6 +28,11 @@ use auth::jwt::jwt_middleware;
 use auth::login::{login, logout, signup};
 use graphql::schema::create_schema;
 
+// Use Jemalloc only for musl-64 bits platforms
+#[cfg(all(target_env = "musl", target_pointer_width = "64"))]
+#[global_allocator]
+static ALLOC: jemallocator::Jemalloc = jemallocator::Jemalloc;
+
 async fn graphql_playground() -> impl IntoResponse {
     Html(playground_source(
         GraphQLPlaygroundConfig::new("/graphql").subscription_endpoint("/ws"),

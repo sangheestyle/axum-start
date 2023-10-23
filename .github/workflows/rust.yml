@@ -23,3 +23,5 @@ jobs:
         run: cargo test --verbose
       - name: Build Docker Image
         run: docker build -t axum-start .
+      - name: Show Docker Image size
+        run: docker image ls axum-start-linum-amd64

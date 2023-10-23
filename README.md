@@ -18,16 +18,21 @@ RUST_LOG=tower_http=trace cargo run
 On my m1 macbook pro,
 
 ```
-# docker on m1 macbook pro
-docker build . -t axum-start
-docker run -p 8000:8000 --env-file .env.docker.local axum-start
-
 # docker on m1 macbook pro for linux/amd64
 docker build --platform linux/amd64 . -t axum-start-linum-amd64
 docker run --platform linux/amd64 -p 8000:8000 --env-file .env.docker.local axum-start-linum-amd64
+
+# docker on m1 macbook pro
+docker build . -t axum-start
+docker run -p 8000:8000 --env-file .env.docker.local axum-start
 ```
 
 For run the image locally on M1 MacBook from `docker buildx`, use the `--load` flag with docker buildx build. This will save the built image to your local Docker image registry, allowing you to run it directly.
+
+### Reference
+
+* https://loige.co/building_x86_rust-containers-from-mac-silicon/
+* https://kerkour.com/rust-small-docker-image
 
 ## DB
 
