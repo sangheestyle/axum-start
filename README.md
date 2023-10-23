@@ -17,7 +17,7 @@ RUST_LOG=tower_http=trace cargo run
 
 ```
 docker build -t axum-start .
-docker run -dp 127.0.0.1:3000:3000 axum-start
+docker run -dp 127.0.0.1:8000:8000 axum-start
 ```
 
 ## DB
@@ -150,3 +150,9 @@ Open http://localhost:8000/graphiql and you will get error. Just click `HTTP HEA
 ```
 
 Just reload the browser and everything will be ok.
+
+## Misc
+
+```
+cargo install cargo-udeps && cargo +nightly udeps
+```
